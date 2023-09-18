@@ -1,6 +1,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Medical ChatBot</title>
     <style>
@@ -10,61 +11,90 @@
             padding: 10px 15px;
             font-size: 15px;
         }
+
+        .sampleQuestion {
+            text-decoration: none;
+            color: blue;
+            cursor: pointer;
+        }
+
+        .sampleQuestion:hover {
+            text-decoration: underline;
+        }
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
+
 <body>
 
-<h1>Medical ChatBot</h1>
-<h4>Ask any medical question. English only</h4>
-<sub>Based on GPT-2 Large, fine-tuned on medical data</sub>
-<br></br>
-<div id="chatBox" style="border: 1px solid black; height: 400px; overflow-y: scroll; padding: 20px;">
-    <!-- Conversation here -->
-</div>
-<br></br>
+    <h1>Medical ChatBot</h1>
+    <h4>Ask any medical question. English only</h4>
+    <sub>Based on GPT-2 Large, fine-tuned on medical data</sub>
+    <br></br>
+    <div id="chatBox" style="border: 1px solid black; height: 400px; overflow-y: scroll; padding: 20px;">
+        <!-- Conversation here -->
+    </div>
+    <br></br>
 
-<form id="chatForm" method="post">
-    {% csrf_token %}
-    <input type="text" name="user_message" placeholder="Enter your message..." required>
-    <input type="submit" id="submitButton" value="Send">
-</form>
-
-<script>
-$(document).ready(function() {
-    $("#chatForm").submit(function(event) {
-        event.preventDefault();
-
-        let userMessage = $("input[name='user_message']").val();
-
-        $("#chatBox").append(
-            "<div><strong>You:</strong> " + userMessage + "<br></div>"
-        );
-        scrollToBottom();
+    <form id="chatForm" method="post">
+        {% csrf_token %}
+        <input type="text" name="user_message" placeholder="Enter your message..." required>
+        <input type="submit" id="submitButton" value="Send">
+    </form>
 
 
-        $("input[name='user_message']").val('');
-        $("input[name='user_message']").prop('disabled', true);
-        $("#submitButton").prop("disabled", true);
+    <div id="exampleQuestions">
+        <h3>Example Questions:</h3>
+        <ul>
+            <li><a href="#" class="sampleQuestion">What is a heart attack?</a></li>
+            <li><a href="#" class="sampleQuestion">What are antibiotics?</a></li>
+            <li><a href="#" class="sampleQuestion">What are the treatments for a fever?</a></li>
+            <li><a href="#" class="sampleQuestion">Should I drink more water when I have diarrhea?</a></li>
+        </ul>
+    </div>
 
-        $.post('', {user_message: userMessage, csrfmiddlewaretoken: '{{ csrf_token }}'}, function(data) {
-            let botResponse = data.bot_response;
+    <script>
+        $(document).ready(function () {
+            $("#chatForm").submit(function (event) {
+                event.preventDefault();
 
-            $("#chatBox").append(
-                "<strong>Bot:</strong> " + botResponse + "<br><br>"
-            );
-            scrollToBottom();
-            $("input[name='user_message']").prop('disabled', false);
-            $("#submitButton").prop("disabled", false);
-            $("input[name='user_message']").focus();
+                let userMessage = $("input[name='user_message']").val();
+
+                $("#chatBox").append(
+                    "<div><strong>You:</strong> " + userMessage + "<br></div>"
+                );
+                scrollToBottom();
+
+
+                $("input[name='user_message']").val('');
+                $("input[name='user_message']").prop('disabled', true);
+                $("#submitButton").prop("disabled", true);
+
+                $.post('', { user_message: userMessage, csrfmiddlewaretoken: '{{ csrf_token }}' }, function (data) {
+                    let botResponse = data.bot_response;
+
+                    $("#chatBox").append(
+                        "<strong>Bot:</strong> " + botResponse + "<br><br>"
+                    );
+                    scrollToBottom();
+                    $("input[name='user_message']").prop('disabled', false);
+                    $("#submitButton").prop("disabled", false);
+                    $("input[name='user_message']").focus();
+                });
+            });
+            function scrollToBottom() {
+                $('#chatBox').scrollTop($('#chatBox')[0].scrollHeight);
+            }
+            $(".sampleQuestion").click(function (event) {
+                event.preventDefault();
+                let question = $(this).text();
+                $("input[name='user_message']").val(question);
+                $("input[name='user_message']").focus();
+            });
         });
-    });
-    function scrollToBottom() {
-        $('#chatBox').scrollTop($('#chatBox')[0].scrollHeight);
-    }
-});
 
-</script>
+    </script>
 
 </body>
+
 </html>
